@@ -1,0 +1,27 @@
+# Define a versão do Compose. A 3.8 é estável e compatível com Docker Desktop atual.
+version: '3.8'
+
+# Início da definição dos serviços (containers que vão rodar)
+services:
+  # Nome do serviço (container) que será criado
+  api:
+    # Informa que o Docker deve construir a imagem a partir do Dockerfile da pasta atual
+    build: .
+    
+    # Define o nome fixo do container para facilitar os comandos (docker logs, docker stop etc.)
+    container_name: api-container
+
+    # Mapeia as portas: "porta_do_host:porta_do_container"
+    # Isso permite acessar a aplicação em http://localhost:8000
+    ports:
+      - "8000:8000"
+
+    # Faz um bind mount: vincula a pasta atual (.) no host com a pasta /app no container
+    # Assim, alterações nos arquivos locais refletem no container sem rebuild, útil com --reload
+    volumes:
+      - .:/app
+
+    # Sobrescreve o comando padrão do Dockerfile
+    # Aqui inicia o Uvicorn servindo o app, ouvindo em todas interfaces (0.0.0.0)
+    # e ativando o reload automático para desenvolvimento
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload
